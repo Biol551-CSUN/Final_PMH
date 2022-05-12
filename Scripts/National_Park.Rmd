@@ -1,0 +1,235 @@
+---
+title: '"National Parks"'
+author: "Margarita Alfaro"
+date: "5/10/2022"
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = '../output', warning = FALSE, message = FALSE)
+```
+
+# Introduction 
+
+On August 25, 1916, President Woodrow Wilson signed the "Organic Act" creating the National Park Service, a federal bureau in the Department of the Interior responsible for maintaining national parks and monuments that were then managed by the department. The National Park System has since expanded to 423 units (often referred to as parks), more than 150 related areas, and numerous programs that assist in conserving the nation's natural and cultural heritage for the benefit of current and future generations.(national park gov)
+
+# List of National Parks
+There are 63 National Parks and 9 of them are in California which make it the state with more national parks followed by Alaska with 8.
+
+1. Denali National Park, Alaska
+2. Gates of the Arctic National Park, Alaska
+3. Glacier Bay National Park, Alaska
+4. Katmai National Park, Alaska
+5. Kenai Fjords National Park, Alaska
+6. Kobuk Valley National Park, Alaska
+7. Lake Clark National Park, Alaska
+8. Wrangell-St. Elias National Park, Alaska
+9. National Park of American Samoa, American Samoa
+10. Grand Canyon National Park, Arizona
+11. Petrified Forest National Park, Arizona
+12. Saguaro National Park, Arizona
+13. Hot Springs National Park, Arkansas
+13. Channel Islands National Park, California
+15. Death Valley National Park, California and Nevada
+16. Joshua Tree National Park, California
+17. Kings Canyon National Park, California
+18. Lassen Volcanic National Park, California
+19. Pinnacles National Park, California
+20. Redwood National Park, California
+21. Sequoia National Park, California
+22. Yosemite National Park, California
+23. Black Canyon of the Gunnison National Park, Colorado
+24. Great Sand Dunes National Park, Colorado
+25. Mesa Verde National Park, Colorado
+26. Rocky Mountain National Park, Colorado
+27. Biscayne National Park, Florida
+28. Everglades National Park, Florida
+29. Dry Tortugas National Park, Florida
+30. Haleakalā National Park, Hawaii
+31. Hawai'i Volcanoes National Park, Hawaii
+32. Yellowstone National Park, Idaho, Montana, and Wyoming
+33. Indiana Dunes National Park, Indiana
+34. Mammoth Cave National Park, Kentucky
+35. Acadia National Park, Maine
+36. Isle Royale National Park, Michigan
+37. Voyageurs National Park, Minnesota
+38. Gateway Arch National Park, Missouri and Illinois
+39. Glacier National Park, Montana
+40. Great Basin National Park, Nevada
+41. White Sands National Park, New Mexico
+42. Carlsbad Caverns National Park, New Mexico
+43. Great Smoky Mountains National Park, North Carolina and Tennessee
+44. Theodore Roosevelt National Park, North Dakota
+45. Cuyahoga Valley National Park, Ohio
+46. Crater Lake National Park, Oregon
+47. Badlands National Park, South Dakota
+48. Wind Cave National Park, South Dakota
+49. Congaree National Park, South Carolina
+50. Big Bend National Park, Texas
+51. Guadalupe Mountains National Park, Texas
+52. Arches National Park, Utah
+53. Bryce Canyon National Park, Utah
+54. Canyonlands National Park, Utah
+55. Capitol Reef National Park, Utah
+56. Zion National Park, Utah
+57. Virgin Islands National Park, Virgin Islands
+58. Shenandoah National Park, Virginia
+59. Olympic National Park, Washington
+60. Mount Rainier National Park, Washington
+61. North Cascades National Park, Washington
+62. New River Gorge National Park and Preserve, West Virginia
+63. Grand Teton National Park, Wyoming
+
+
+# Load Libraries
+```{r}
+library(tidyverse)
+library(here)
+library(gganimate)
+library(ggplot2)
+library(reactable)
+library(plotrix)
+library(cowsay)
+```
+
+# Load Data
+```{r}
+park_visits <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-09-17/national_parks.csv")
+state_pop <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-09-17/state_pop.csv")
+```
+
+
+# Plot 1 (State Population)
+US have 50 states and California is the state with most of the population.
+
+list of the 10 most populated states in US:
+
+1. California (Population: 39,613,493)
+2. Texas (Population: 29,730,311)
+3. Florida (Population: 21,944,577)
+4. New York (Population: 19,299,981)
+5. Pennsylvania (Population: 12,804,123)
+6. Illinois (Population: 12,569,321)
+7. Ohio (Population: 11,714,618)
+8. Georgia (Population: 10,830,007)
+
+9.North Carolina (Population: 10,701,022)
+10. Michigan (Population: 9,992,427)
+
+Population in States that have National Parks from 1900 to 2015
+```{r}
+pop <- state_pop %>%
+  select(year, state, pop) %>% #select variables
+  mutate(year, state, pop) %>% #create new columns
+  filter(year == "1900" | year == "1910" | year == "1920" | year == "1930" | year == "1940" | year == "1950" | year == "1960" | year == "1970" | year == "1980" | year == "1990" | year == "2000" | year == "2005" | year == "2010" | year == "2015") %>% #extract/filter specific years
+  filter(state == "CA" | state == "AK" | state == "UT" | state == "CO" | state == "WA" | state == "FL" | state == "AZ" | state == "HI" | state == "NM" | state == "SD" | state == "TX" | state == "MT" | state == "WY" | state == "WV" | state == "VA" | state == "VI" | state == "SC" | state == "OR" | state == "OH" | state == "ND" | state == "NC" | state == "TN" | state == "NV" | state == "MO" | state == "IL" | state == "MN" | state == "MI" | state == "ME" | state == "KY" | state == "IN" | state == "ID" | state == "AR" | state == "AS") %>% #extract/filter specific state name
+drop_na() #drops rows with NAs from a specific column
+```
+
+```{r, fig.width= 15, fig.height=8}
+pop %>%
+  ggplot(aes(x= state, y= pop))+
+  geom_point(color="firebrick3", size=4) + #create the plot
+   labs(x= "States with National Parks", y= "Population Growth", #labels our x and y-axis
+       subtitle= "Increment in Population from 1900-2015 ", #creates and label the subtitle
+       caption = "Source: 2019-09-17 TidyTuesday  Data from the dataisplural/data.world")+
+  transition_states(
+     year, # what are we animating by
+     transition_length = 2, #The relative length of the transition.
+     state_length = 1 # The length of the pause between transitions
+   )+
+  theme_light() + #add a theme to the plot
+   theme(
+    panel.grid.major.x = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks.x = element_blank()
+  )+ #change out plot elements
+  theme(axis.text.x = element_text(angle=90)) #put x-axis vertically
+
+```
+
+# Plot 2 (CA Population)
+Pollulation in CA from 1900 to 2015 
+```{r}
+popCA <- state_pop %>%
+  select(year, state, pop) %>% #select variables
+  mutate(year, state, pop) %>% #select new columns
+  filter(year == "1900" | year == "1910" | year == "1920" | year == "1930" | year == "1940" | year == "1950" | year == "1960" | year == "1970" | year == "1980" | year == "1990" | year == "2000" | year == "2005" | year == "2010" | year == "2015") %>% #select specific years
+  filter(state == "CA") %>% #select specific state name "CA"
+drop_na() #drops rows with NAs from a specific column
+```
+
+```{r}
+popCA %>%
+  ggplot(aes(x= year, y= pop))+ 
+  geom_col()+ #create the plot
+  geom_smooth()+ #adds a best fit line
+  labs(x= "States", y= "Population Growth", #labels our x and y-axis
+       title = "California", #creates our title
+       subtitle= "Change in Population from 1900-2015 ", #creates and label the subtitle
+       caption = "Source: 2019-09-17 TidyTuesday  Data from the dataisplural/data.world")+
+  theme_classic() #add a theme
+```
+
+
+# Plot 3 (Table for CA Park Visits)
+```{r}
+park <- park_visits %>% 
+  filter(state == "CA") %>% #select state name "CA"
+  filter(year == "2016") %>% #select year "2016"
+  drop_na() #drops rows with NAs from a specific column
+```
+
+# Reactable Table
+Creates interactive data tables for R.
+The following interactive table includes information about National Parks, National Historic Site, National Monument, National Recreation Area, and National Preserve located in California for the year 2016.
+
+Interactive table for National Parks in CA for 2016
+```{r}
+reactable(park) #create the interactive table
+```
+
+
+# Plot 4 (National Parks in CA)
+Visitors in 8/9 national parks in CA for 2016
+
+1. Channel Islands National Park
+2. Death Valley National Park
+3. Joshua Tree National Park
+4. Kings Canyon National Park
+5. Lassen Volcanic National Park
+6. Pinnacles National Park
+7. Sequoia National Park
+8. Yosemite National Park
+9. ***(Redwood National Park) Not in Data
+
+
+```{r}
+CApark <- park_visits %>%
+  filter(state == "CA") %>% #select specific state CA
+  filter(year == "2016") %>% #select specific year
+  filter(unit_type == "National Park") %>% #select national park only
+  drop_na() #drops rows with NAs from a specific column
+```
+
+Data for the 3D pie graph
+```{r}
+CA <- c(1254688, 364807, 607479, 2505286, 215555, 1296283, 536068, 5028868) #vector containing the numeric values
+labels <- c("Sequoia", "Channel Islands", "Kings Canyon", "Joshua Tree", "Pinnacles", "Death Valley", "Lassen Volcanic", "Yosemite") #add names to the 3D pie
+```
+
+```{r,fig.width= 6, fig.height=5.4}
+pie3D(CA, labels = labels, #add the names
+      explode = 0.1, #separate the pie into pieces
+      main= "National Parks Visits in CA", #give tittle to the pie
+      col=c("deepskyblue2", "goldenrod1", "pink1", "darkolivegreen3", "burlywood4", "azure3", "chocolate2", "cadetblue4"), #add colors to the pie
+      labelpos=NULL)
+```
+# End
+```{r}
+say("END", by = "cow")
+```
